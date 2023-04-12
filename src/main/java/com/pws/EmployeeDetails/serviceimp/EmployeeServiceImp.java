@@ -1,30 +1,36 @@
 package com.pws.EmployeeDetails.serviceimp;
 
+import com.pws.EmployeeDetails.entity.Admin;
 import com.pws.EmployeeDetails.entity.Employee;
 import com.pws.EmployeeDetails.excpetion.IdNotFoundException;
+import com.pws.EmployeeDetails.repository.AdminRepository;
 import com.pws.EmployeeDetails.repository.EmployeeRepository;
 import com.pws.EmployeeDetails.service.EmployeeService;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class EmployeeServiceImp implements EmployeeService {
 
-    @Autowired
-    EmployeeRepository repository;
+
+    private final EmployeeRepository repository;
+
+    private final AdminRepository adminRepository;
 
 
     @Override
-    public Employee saveEmployee(Employee employee) {
+    public Employee saveEmployee(Employee employee, int id) {
+        Optional<Admin> optional = adminRepository.findById(id);
+        if (optional.isEmpty()) {
+            throw new IdNotFoundException("Invalid Admin Id");
+        }
+        employee.setAdmin(optional.get());
         return repository.save(employee);
     }
 
